@@ -2,19 +2,11 @@ import telebot
 import time
 from telebot import types
 from string import Template
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from re import *
 
 # Назначаем боту наш токен
 bot = telebot.TeleBot('1858986723:AAHq-n_dtq4QovlJ1s8lDGk6sbyVw2d-2MY')
 
-# Указываем какой текст мы будем ждать от бота, все остальное будет вызывать сообщение 'Данные введены неверно'
-status = ["Проблема номер 1", "Проблема номер 2", "Проблема номер 3",
-          "Проблема номер 4", "Проблема номер 5", "Проблема номер 6", "Проблема номер 7", "Проблема номер 8",
-          "Проблема номер 9", "Большая дилемма", "Небольшая дилемма", "Другая дилемма",
-          "У меня другой запрос"]
 
 inc_type = []  # Хранит в себе тип заявки
 cli_num = []  # Хранит в себе номер телефона заявителя
@@ -94,6 +86,7 @@ def pre_main(message):  # Основная функция
     key = types.ReplyKeyboardMarkup(True, False)
     key.row('Наши услуги и стоимость', "Контакты и адрес")
     key.row('Записаться', "Мы на карте")
+    key.row('Наши соц сети')
     key.one_time_keyboard = True
     try:  # Спрашиваем что за инцент
         bot.send_message(message.chat.id,
@@ -142,6 +135,19 @@ def main(message):  # Определяем тип инцидента и уточ
         keyboard.row('Ⓜ Главное меню')
         keyboard.one_time_keyboard = True
         bot.send_message(message.chat.id, 'Возврат в главное меню ⤵', reply_markup=keyboard)
+    elif message.text == 'Наши соц сети':
+        key = types.InlineKeyboardMarkup(row_width=2)
+        inst = types.InlineKeyboardButton(text='Instagram', url='https://instagram.com/garage1_yar')
+        vk = types.InlineKeyboardButton(text='Vkontakte', url='https://vk.com/garage1_yar')
+        avito = types.InlineKeyboardButton(text='Avito', url='https://www.avito.ru/user/2ff12a1824cec4ae791ce715ef78ec7a/profile?src=sharing')
+        yandex = types.InlineKeyboardButton(text='Yandex', url='https://uslugi.yandex.ru/profile/Garazh1-254534')
+        key.add(inst, vk, avito, yandex)
+        bot.send_message(message.chat.id, "Нажмите на кнопку и перейдите по ссылке", reply_markup=key)
+
+        keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
+        keyboard.row('Ⓜ Главное меню')
+        keyboard.one_time_keyboard = True
+        bot.send_message(message.chat.id, 'Возврат в главное меню ⤵', reply_markup=keyboard)
     elif message.text == 'Мы на карте':
         bot.send_location(message.chat.id, 57.671202, 39.828057)
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
@@ -177,19 +183,6 @@ def user_reg(message):
     keyboard.row('Кострома')
     keyboard.row('Иваново')
     msg = bot.send_message(message.chat.id, 'Выберите город ⤵', reply_markup=keyboard)
-    """""
-    Старая клава
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    itembtn1 = types.KeyboardButton('Ярославль')
-    itembtn2 = types.KeyboardButton('Рыбинск')
-    itembtn3 = types.KeyboardButton('Тутаев')
-    itembtn4 = types.KeyboardButton('Кострома')
-    itembtn5 = types.KeyboardButton('Иваново')
-    itembtn6 = types.KeyboardButton('Москва')
-    markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6)
-    msg = bot.send_message(message.chat.id, 'Ваш город?', reply_markup=markup)
-    """""
-
     bot.register_next_step_handler(msg, process_city_step)
 
 
@@ -336,7 +329,11 @@ def process_carDate_step(message):
 # в send_message должно стоять parse_mode="Markdown"
 def getRegData(user, title, name):
     t = Template(
-        '$title *$name* \n Город: *$userCity* \n Обращение: *$fullname* \n Телефон: *$phone*\n Телефон при авторизации: *$phoneUM* \n Марка автомобиля: *$driverSeria* \n Модель автомобиля: *$driverNumber* \n Тип кпп и объем двигателя: *$driverDate* \n Год выпуска: *$car* \n Услуга: *$carModel* \n Приблизительное время записи: *$carNumber* \n Когда можно позвонить клиенту: *$carDate* \n Спасибо за заявку, мы свяжемся с вами в ближайшее время!')
+        '$title *$name* \n Город: *$userCity* \n Обращение: *$fullname* \n Телефон: *$phone*\n Телефон при '
+        'авторизации: *$phoneUM* \n Марка автомобиля: *$driverSeria* \n Модель автомобиля: *$driverNumber* \n Тип кпп '
+        'и объем двигателя: *$driverDate* \n Год выпуска: *$car* \n Услуга: *$carModel* \n Приблизительное время '
+        'записи: *$carNumber* \n Когда можно позвонить клиенту: *$carDate* \n Спасибо за заявку, мы свяжемся с вами в '
+        'ближайшее время!')
 
     return t.substitute({
         'title': title,
@@ -355,114 +352,6 @@ def getRegData(user, title, name):
     })
 
 
-
-
-"""""
-def incedent(message):  # Обрабатываем подтип инцедента
-    keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-    keyboard.add('Ⓜ Главное меню')
-
-    if message.text == 'Большая проблема':
-        keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Проблема номер 1')
-        keyboard.row('Проблема номер 2')
-        keyboard.row('Проблема номер 3')
-        keyboard.add('Ⓜ Главное меню')
-        keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Укажите вашу проблему ⤵', reply_markup=keyboard)
-        bot.register_next_step_handler(message, vvod)
-
-    elif message.text == 'Небольшая проблема':
-        keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Проблема номер 4')
-        keyboard.row('Проблема номер 5')
-        keyboard.row('Проблема номер 6')
-        keyboard.add('Ⓜ Главное меню')
-        keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Укажите вашу проблему ⤵', reply_markup=keyboard)
-        bot.register_next_step_handler(message, vvod)
-
-    elif message.text == 'Другая проблема':
-        keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Проблема номер 7')
-        keyboard.row('Проблема номер 8')
-        keyboard.row('Проблема номер 9')
-        keyboard.add('Ⓜ Главное меню')
-        keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Укажите вашу проблему ⤵', reply_markup=keyboard)
-        bot.register_next_step_handler(message, vvod)
-
-    elif message.text == 'Ⓜ Главное меню':
-        pre_main(message)
-
-    else:
-        bot.send_message(message.chat.id, 'Данные введены неверно 😢')
-        pre_main(message)
-
-
-def info(message):  # Обработываем подтип запроса информации
-    if message.text == 'Ⓜ Главное меню':
-        pre_main(message)
-    elif message.text == 'Большая дилемма':
-        global task
-        task = message.text
-        vvod(message)
-    elif message.text == 'Небольшая дилемма':
-        task = message.text
-        vvod(message)
-    elif message.text == 'Другая дилемма':
-        task = message.text
-        vvod(message)
-    else:
-        text(message)
-        bot.send_message(message.chat.id, 'Данные введены неверно')
-        pre_main(message)
-
-
-def vvod(message):  # Запрашиваем дополнительную информацию
-    inc_type.append(message.text)
-    global task
-    if message.text in status:
-        task = message.text
-        bot.send_message(message.chat.id, 'Введите детали вашего запроса в строку ввода 😊')
-        bot.register_next_step_handler(message, text)
-    else:
-        bot.send_message(message.chat.id, 'Данные введены неверно')
-        pre_main(message)
-
-
-def text(message):  # Отправляем письмо
-    if message.text == 'Ⓜ Главное меню':
-        pre_main(message)
-    else:
-        keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Ⓜ Главное меню')
-        bot.send_message(message.chat.id, 'Ваше запрос \"' + message.text +
-                         '\" получен. Можете вернуться в главное меню ⤵', reply_markup=keyboard)
-        addr_from = "mail@gmail.com"
-        addr_to = "ivanrezv@icloud.com"
-        password = "password"
-        msg = MIMEMultipart()  # Создаем сообщение
-        msg['From'] = addr_from
-        msg['To'] = addr_to
-        msg['Subject'] = ("$$$" + message.text)
-        body = (f'''
-      Автор заявки {message.from_user.first_name},{message.from_user.last_name},
-
-      Телефон {cli_num}
-
-      Тип заявки: {inc_type},
-
-      Текст заявки: {message.text}
-      ''')
-        msg.attach(MIMEText(body, 'plain'))  # Добавляем в сообщение текст
-        smtpObj = smtplib.SMTP('smtp.gmail.com', 587)  # Создаем объект SMTP
-        smtpObj.starttls()  # Начинаем шифрованный обмен по TLS
-        smtpObj.login(addr_from, password)  # Получаем доступ
-        smtpObj.send_message(msg)  # Отправляем сообщение
-        smtpObj.quit()  # Выходим
-
-"""
 while True:  # Запускаем бота
     try:
         bot.polling(none_stop=True)
