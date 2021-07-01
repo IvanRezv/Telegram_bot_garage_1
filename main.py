@@ -18,9 +18,9 @@ hello_count = []  # Хранит в себе данные о том нужно �
 @bot.message_handler(commands=['start'])
 def statup(message):  # Здороваемся и просим ввести номер или почту
     key1 = types.ReplyKeyboardMarkup(True, False)
-    button_phone = types.KeyboardButton(text="Отправить номер телефона", request_contact=True)
+    button_phone = types.KeyboardButton(text="Отправить номер телефона ☎", request_contact=True)
     key1.row(button_phone)
-    key1.row('Ввести почту')
+    key1.row('Ввести почту ✉')
     key1.one_time_keyboard = True
     if len(hello_count) == 0:  # Проверяем здоровались ли мы ранее
         bot.send_message(message.chat.id,
@@ -90,7 +90,7 @@ def pre_main(message):  # Основная функция
     key.one_time_keyboard = True
     try:  # Спрашиваем что за инцент
         bot.send_message(message.chat.id,
-                         "Итак, {0.first_name}!, что у вас случилось?.".format(
+                         "Доброго времени суток, {0.first_name}!, выберите то, что вас интересует".format(
                              message.from_user, bot.get_me()),
                          parse_mode='html', reply_markup=key)
         print('No problem detected. Message send')
@@ -123,24 +123,25 @@ def main(message):  # Определяем тип инцидента и уточ
         keyboard.row('Ⓜ Главное меню')
         bot.send_message(message.chat.id, 'Возврат в главное меню ⤵', reply_markup=keyboard)
     elif message.text == 'Записаться':
-        bot.send_message(message.chat.id, 'Хотите записаться?')
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Да')
+        keyboard.row('Записаться')
+        bot.send_message(message.chat.id, 'Обращаю ваше внимание, что пользоваться можно как кнопками, так и ручным '
+                                          'вводом текста и цифр', reply_markup=keyboard)
         bot.register_next_step_handler(message, user_reg)
     elif message.text == 'Контакты и адрес':
         bot.send_message(message.chat.id, '📱 +79610218408 Сергей''\n'
                                           '📱 +79056379476 Никита''\n'
-                                          'г. Ярославль, Ленинградский проспект 25А, Бокс №1')
+                                          '📪 г. Ярославль, Ленинградский проспект 25А, Бокс №1')
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
         keyboard.row('Ⓜ Главное меню')
         keyboard.one_time_keyboard = True
         bot.send_message(message.chat.id, 'Возврат в главное меню ⤵', reply_markup=keyboard)
     elif message.text == 'Наши соц сети':
         key = types.InlineKeyboardMarkup(row_width=2)
-        inst = types.InlineKeyboardButton(text='Instagram', url='https://instagram.com/garage1_yar')
-        vk = types.InlineKeyboardButton(text='Vkontakte', url='https://vk.com/garage1_yar')
-        avito = types.InlineKeyboardButton(text='Avito', url='https://www.avito.ru/user/2ff12a1824cec4ae791ce715ef78ec7a/profile?src=sharing')
-        yandex = types.InlineKeyboardButton(text='Yandex', url='https://uslugi.yandex.ru/profile/Garazh1-254534')
+        inst = types.InlineKeyboardButton(text='🌐Inst🌐', url='https://instagram.com/garage1_yar')
+        vk = types.InlineKeyboardButton(text='🌐VK🌐', url='https://vk.com/garage1_yar')
+        avito = types.InlineKeyboardButton(text='🌐Avito🌐', url='https://www.avito.ru/user/2ff12a1824cec4ae791ce715ef78ec7a/profile?src=sharing')
+        yandex = types.InlineKeyboardButton(text='🌐Yandex🌐', url='https://uslugi.yandex.ru/profile/Garazh1-254534')
         key.add(inst, vk, avito, yandex)
         bot.send_message(message.chat.id, "Нажмите на кнопку и перейдите по ссылке", reply_markup=key)
 
@@ -319,6 +320,11 @@ def process_carDate_step(message):
         # отправить в группу
         bot.send_message('-535132227', getRegData(user, 'Заявка от бота', bot.get_me().username),
                          parse_mode="Markdown")
+        bot.send_message('-535132227', cli_num, parse_mode="Markdown")
+        keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
+        keyboard.row('Ⓜ Главное меню')
+        keyboard.one_time_keyboard = True
+        bot.send_message(message.chat.id, 'Возврат в главное меню ⤵', reply_markup=keyboard)
 
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
@@ -329,8 +335,8 @@ def process_carDate_step(message):
 # в send_message должно стоять parse_mode="Markdown"
 def getRegData(user, title, name):
     t = Template(
-        '$title *$name* \n Город: *$userCity* \n Обращение: *$fullname* \n Телефон: *$phone*\n Телефон при '
-        'авторизации: *$phoneUM* \n Марка автомобиля: *$driverSeria* \n Модель автомобиля: *$driverNumber* \n Тип кпп '
+        '$title *$name* \n Город: *$userCity* \n Обращение: *$fullname* \n Телефон: *$phone*\n Марка автомобиля: '
+        '*$driverSeria* \n Модель автомобиля: *$driverNumber* \n Тип кпп '
         'и объем двигателя: *$driverDate* \n Год выпуска: *$car* \n Услуга: *$carModel* \n Приблизительное время '
         'записи: *$carNumber* \n Когда можно позвонить клиенту: *$carDate* \n Спасибо за заявку, мы свяжемся с вами в '
         'ближайшее время!')
@@ -341,7 +347,6 @@ def getRegData(user, title, name):
         'userCity': user.city,
         'fullname': user.fullname,
         'phone': user.phone,
-        'phoneUM': cli_num,
         'driverSeria': user.driverSeria,
         'driverNumber': user.driverNumber,
         'driverDate': user.driverDate,
