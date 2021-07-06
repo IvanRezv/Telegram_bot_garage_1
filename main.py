@@ -5,7 +5,7 @@ from string import Template
 from re import *
 
 # Назначаем боту наш токен
-bot = telebot.TeleBot('1858986723:AAHq-n_dtq4QovlJ1s8lDGk6sbyVw2d-2MY')
+bot = telebot.TeleBot('secret token')
 
 inc_type = []  # Хранит в себе тип заявки
 cli_num = []  # Хранит в себе номер телефона заявителя
